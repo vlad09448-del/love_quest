@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Маленький квест для самой особенной ✨</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение шрифтов Nunito и Caveat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Подключение Tone.js для нежных звуков -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <style>
+        /* Базовая палитра и уютная эстетика */
+        :root {
+            --bg-cream: #FFF8F6;
+            --pink-soft: #FFE4EC;
+            --pink-accent: #FF7597;
+            --pink-dark: #E05277;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(145deg, #FFF5F7 0%, #FDF2F8 45%, #F5F3FF 100%);
+            color: #4A3540;
+            min-height: 100dvh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .font-handwriting {
+            font-family: 'Caveat', cursive;
+        }
+
+        /* Плавающие сердечки и цветочки на фоне */
+        .floating-bg {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-particle {
+            position: absolute;
+            bottom: -40px;
+            opacity: 0.45;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg) scale(0.8); opacity: 0; }
+            15% { opacity: 0.5; }
+            85% { opacity: 0.5; }
+            100% { transform: translateY(-110vh) rotate(360deg) scale(1.15); opacity: 0; }
+        }
+
+        /* Полупрозрачная уютная карточка */
+        .cozy-card {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 2px solid rgba(255, 255, 255, 0.98);
+            box-shadow: 0 16px 36px -12px rgba(244, 114, 182, 0.24), 0 4px 12px rgba(0, 0, 0, 0.03);
+        }
+
+        /* Главная романтичная кнопка */
+        .btn-love {
+            background: linear-gradient(135deg, #FF7597 0%, #FF9671 100%);
+            box-shadow: 0 10px 22px -6px rgba(255, 117, 151, 0.55);
+            transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .btn-love:hover {
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: 0 14px 26px -6px rgba(255, 117, 151, 0.65);
+        }
+
+        .btn-love:active {
+            transform: translateY(1px) scale(0.97);
+        }
+
+        /* Сетка пазла 3x3 */
+        .puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            aspect-ratio: 1 / 1;
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            background: #FFE4EC;
+            padding: 7px;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 8px rgba(224, 82, 119, 0.14);
+        }
+
+        .puzzle-tile {
+            border-radius: 12px;
+            background-size: 300% 300%;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+            border: 2px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+        }
+
+        .puzzle-tile.selected {
+            transform: scale(0.91);
+            border-color: #FF4D79;
+            box-shadow: 0 0 0 3.5px rgba(255, 77, 121, 0.4);
+            z-index: 10;
+        }
+
+        .puzzle-tile.correct-glow {
+            border-color: #34D399;
+        }
+
+        /* Мягкая пульсация */
+        @keyframes gentlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        .pulse-soft {
+            animation: gentlePulse 2.6s ease-in-out infinite;
+        }
+
+        /* Вылетающие сердечки и фразы при клике */
+        .tap-heart {
+            position: fixed;
+            pointer-events: none;
+            font-size: 1.5rem;
+            z-index: 9999;
+            animation: popHeart 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes popHeart {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 1; }
+            65% { opacity: 1; }
+            100% { transform: translate(-50%, -145%) scale(1.35) rotate(10deg); opacity: 0; }
+        }
+
+        /* Полароид-рамки */
+        .polaroid {
+            background: #FFFFFF;
+            padding: 8px 8px 22px 8px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(74, 53, 64, 0.12);
+            transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .polaroid:hover {
+            transform: scale(1.04) rotate(0deg) !important;
+            z-index: 20;
+        }
+
+        /* Плавный переход между экранами */
+        .screen-enter {
+            animation: fadeSlideIn 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes fadeSlideIn {
+            from { opacity: 0; transform: translateY(14px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-3 sm:p-5 relative">
+
+    <!-- Плавающий фон -->
+    <div id="floating-bg" class="floating-bg"></div>
+
+    <!-- Канвас для праздничного конфетти -->
+    <canvas id="confetti-canvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <!-- Верхний прогресс-бар (показывается во время квеста) -->
+    <header id="progress-header" class="hidden w-full max-w-md mb-3 z-10">
+        <div class="cozy-card rounded-full px-3.5 py-2 flex items-center justify-between gap-2.5">
+            <span class="text-xs font-extrabold text-pink-600 whitespace-nowrap" id="step-label">Уровень 1 из 3</span>
+            <div class="flex-1 h-2 bg-pink-100 rounded-full overflow-hidden">
+                <div id="progress-bar" class="h-full bg-gradient-to-r from-pink-400 to-rose-400 rounded-full transition-all duration-500" style="width: 33%;"></div>
+            </div>
+            <button onclick="openPhotoModal()" class="text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-700 px-2.5 py-1 rounded-full transition cursor-pointer" title="Загрузить свои фото">
+                📸
+            </button>
+            <button onclick="toggleSound()" id="sound-btn" class="text-pink-500 hover:text-pink-700 text-base leading-none p-1 rounded-full transition cursor-pointer" title="Звук">
+                🔔
+            </button>
+        </div>
+    </header>
+
+    <!-- Основной контейнер квеста -->
+    <main class="w-full max-w-md z-10 relative">
+
+        <!-- ==================== ЭКРАН 0: ПРИВЕТСТВИЕ ==================== -->
+        <section id="screen-welcome" class="cozy-card rounded-3xl p-5 sm:p-7 text-center screen-enter relative">
+            <!-- Верхняя строчка с бейджем и аккуратной кнопкой загрузки своих фото -->
+            <div class="flex items-center justify-between gap-2 mb-4">
+                <span class="inline-flex items-center gap-1 bg-pink-100/90 text-pink-600 text-[11px] font-extrabold px-3 py-1 rounded-full">
+                    ✨ Для самой лучшей
+                </span>
+                <button onclick="openPhotoModal()" class="inline-flex items-center gap-1 bg-purple-100/90 hover:bg-purple-200 text-purple-700 text-[11px] font-extrabold px-3 py-1 rounded-full transition cursor-pointer shadow-xs">
+                    <span>📸 Свои фото</span>
+                    <span id="photo-badge-count" class="bg-purple-600 text-white text-[10px] px-1.5 rounded-full">Арт</span>
+                </button>
+            </div>
+
+            <div class="w-20 h-20 mx-auto mb-3.5 rounded-full bg-gradient-to-tr from-pink-200 via-rose-100 to-amber-100 flex items-center justify-center text-4xl shadow-inner pulse-soft">
+                💌
+            </div>
+
+            <h1 class="text-2xl sm:text-[26px] font-extrabold text-gray-800 leading-tight mb-2.5">
+                Маленький квест<br>для самой особенной ✨
+            </h1>
+
+            <p class="text-gray-600 text-xs sm:text-sm leading-relaxed mb-5 px-1">
+                Если захотелось тепла, улыбок и порции нежности — пройди 3 милых уровня, чтобы открыть свой главный сюрприз!
+            </p>
+
+            <!-- Мини-превью уровней -->
+            <div class="grid grid-cols-3 gap-2 mb-5 text-[11px] font-bold text-gray-600">
+                <div class="bg-white/90 rounded-2xl p-2.5 border border-pink-100 shadow-xs">
+                    <div class="text-lg mb-0.5">🧩</div>
+                    <div>Кусочек лета</div>
+                </div>
+                <div class="bg-white/90 rounded-2xl p-2.5 border border-pink-100 shadow-xs">
+                    <div class="text-lg mb-0.5">🐰</div>
+                    <div>Детектор милоты</div>
+                </div>
+                <div class="bg-white/90 rounded-2xl p-2.5 border border-pink-100 shadow-xs">
+                    <div class="text-lg mb-0.5">🎁</div>
+                    <div>Лотерея планов</div>
+                </div>
+            </div>
+
+            <button onclick="startQuest()" class="btn-love w-full py-3.5 px-6 rounded-2xl text-white font-extrabold text-base sm:text-lg tracking-wide cursor-pointer mb-2.5">
+                Начать приключение 💖
+            </button>
+
+            <p class="text-[11px] text-gray-400">
+                Можно пройти прямо сейчас или подставить ваши фото через кнопку «📸 Свои фото»
+            </p>
+        </section>
+
+        <!-- ==================== УРОВЕНЬ 1: ПАЗЛ ==================== -->
+        <section id="screen-level-1" class="hidden cozy-card rounded-3xl p-4 sm:p-6 text-center">
+            <div class="inline-block bg-amber-100 text-amber-800 text-[11px] font-extrabold px-3 py-0.5 rounded-full mb-1.5">
+                Уровень 1 • Кусочек лета
+            </div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-gray-800 mb-1">
+                Собери наше воспоминание 🧩
+            </h2>
+            <p class="text-gray-500 text-xs mb-3">
+                Нажимай на две плитки по очереди, чтобы поменять их местами
+            </p>
+
+            <!-- Поле пазла 3x3 -->
+            <div class="relative mb-3.5">
+                <div id="puzzle-board" class="puzzle-grid"></div>
+
+                <!-- Оверлей подсказки -->
+                <div id="puzzle-hint-overlay" class="hidden absolute inset-0 max-w-[300px] mx-auto rounded-[20px] overflow-hidden border-4 border-white shadow-xl z-20">
+                    <img id="hint-image-el" src="" alt="Подсказка" class="w-full h-full object-cover object-center">
+                    <div class="absolute bottom-2 inset-x-2 bg-black/60 backdrop-blur-xs text-white text-[11px] py-1 rounded-full font-bold">
+                        Вот так должно получиться 😘
+                    </div>
+                </div>
+            </div>
+
+            <!-- Сообщение при сборке пазла -->
+            <div id="level-1-win" class="hidden bg-gradient-to-r from-pink-50 to-rose-50 border border-pink-200 rounded-2xl p-3 mb-3.5">
+                <p class="text-pink-700 font-bold text-xs sm:text-sm">
+                    Ураа! 🥰 Даже когда мы строим смешные рожицы под солнцем — мы самая классная пара на свете!
+                </p>
+            </div>
+
+            <!-- Кнопки управления пазлом -->
+            <div id="puzzle-controls" class="flex items-center justify-center gap-2">
+                <button onmousedown="showHint(true)" onmouseup="showHint(false)" onmouseleave="showHint(false)" ontouchstart="showHint(true)" ontouchend="showHint(false)" class="flex-1 py-2.5 px-3 rounded-xl bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm transition cursor-pointer">
+                    👀 Подсказка
+                </button>
+                <button onclick="autoSolvePuzzle()" class="flex-1 py-2.5 px-3 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 font-bold text-xs sm:text-sm transition cursor-pointer">
+                    Автосборка ✨
+                </button>
+            </div>
+
+            <button id="next-to-2-btn" onclick="goToLevel(2)" class="hidden btn-love w-full py-3.5 px-5 rounded-2xl text-white font-extrabold text-base cursor-pointer">
+                Дальше ✨ →
+            </button>
+        </section>
+
+        <!-- ==================== УРОВЕНЬ 2: ДЕТЕКТОР МИЛОТЫ ==================== -->
+        <section id="screen-level-2" class="hidden cozy-card rounded-3xl p-4 sm:p-6 text-center">
+            <div class="inline-block bg-purple-100 text-purple-700 text-[11px] font-extrabold px-3 py-0.5 rounded-full mb-1.5">
+                Уровень 2 • Детектор милоты
+            </div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-gray-800 mb-1">
+                Погладь котика в ушках 🐱🐰
+            </h2>
+            <p class="text-gray-500 text-xs mb-3">
+                Нажимай на карточку, чтобы зарядить шкалу уюта и нежности на 100%!
+            </p>
+
+            <!-- Контейнер с фото котика и всплывающими стикерами -->
+            <div class="relative w-56 sm:w-64 mx-auto mb-4">
+                <div id="cat-photo-card" onclick="petCat(event)" class="relative rounded-3xl overflow-hidden border-4 border-white shadow-lg cursor-pointer active:scale-95 transition-transform duration-150 aspect-[3/4] bg-pink-50">
+                    <img id="img-level-2" src="" alt="Девушка и котик в ушках" class="w-full h-full object-cover object-top">
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 via-transparent to-transparent p-2.5 text-white text-[11px] font-bold">
+                        ✨ Тапай сюда, чтобы погладить ✨
+                    </div>
+                </div>
+
+                <!-- Плавающие стикеры комплиментов -->
+                <div id="sticker-1" class="hidden absolute -top-2.5 -left-4 bg-pink-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-md -rotate-12">
+                    Ушки-макушки 🐰
+                </div>
+                <div id="sticker-2" class="hidden absolute top-8 -right-4 bg-amber-400 text-amber-950 text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-md rotate-12">
+                    Сладкая булочка 🥐
+                </div>
+                <div id="sticker-3" class="hidden absolute bottom-12 -left-4 bg-purple-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-md -rotate-6">
+                    Главный антистресс 💖
+                </div>
+                <div id="sticker-4" class="hidden absolute -bottom-2.5 -right-3 bg-rose-500 text-white text-[11px] font-extrabold px-2.5 py-1 rounded-full shadow-md rotate-6">
+                    1000% очарования ✨
+                </div>
+            </div>
+
+            <!-- Живая фраза при кликах -->
+            <div id="pet-phrase" class="text-xs font-extrabold text-pink-600 h-4 mb-2 transition-all">
+                Готов к порции обнимашек... 🐾
+            </div>
+
+            <!-- Шкала уюта -->
+            <div class="max-w-xs mx-auto mb-3.5">
+                <div class="flex justify-between text-[11px] font-extrabold text-pink-600 mb-1">
+                    <span>Шкала уюта и нежности</span>
+                    <span id="cozy-percent">0%</span>
+                </div>
+                <div class="w-full h-3.5 bg-pink-100 rounded-full p-0.5 overflow-hidden shadow-inner">
+                    <div id="cozy-meter-bar" class="h-full bg-gradient-to-r from-pink-400 via-rose-400 to-amber-400 rounded-full transition-all duration-200" style="width: 0%;"></div>
+                </div>
+            </div>
+
+            <!-- Секретное послание при 100% -->
+            <div id="level-2-win" class="hidden bg-purple-50 border border-purple-200 rounded-2xl p-3 mb-3.5">
+                <p class="text-purple-800 font-bold text-xs sm:text-sm">
+                    Уровень милоты зашкаливает! Котик в ушках чудесен, но твоя улыбка согревает сильнее любого солнышка 💕
+                </p>
+            </div>
+
+            <button id="next-to-3-btn" onclick="goToLevel(3)" class="hidden btn-love w-full py-3.5 px-6 rounded-2xl text-white font-extrabold text-base cursor-pointer">
+                К финальному уровню 🎁 →
+            </button>
+        </section>
+
+        <!-- ==================== УРОВЕНЬ 3: ЛОТЕРЕЯ ПЛАНОВ ==================== -->
+        <section id="screen-level-3" class="hidden cozy-card rounded-3xl p-4 sm:p-6 text-center">
+            <div class="inline-block bg-rose-100 text-rose-700 text-[11px] font-extrabold px-3 py-0.5 rounded-full mb-1.5">
+                Уровень 3 • Лотерея планов
+            </div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-gray-800 mb-1">
+                Выбери свой идеальный вечер 💌
+            </h2>
+            <p class="text-gray-500 text-xs mb-3">
+                От уютных вечерних прогулок до красивых выходов — открой один секретный конверт!
+            </p>
+
+            <!-- Мини-коллаж из двух атмосферных кадров -->
+            <div class="grid grid-cols-2 gap-2.5 mb-4">
+                <div class="rounded-2xl overflow-hidden border-2 border-white shadow-md aspect-[3/4] relative bg-gray-100">
+                    <img id="img-level-3a" src="" alt="Вечерняя прогулка" class="w-full h-full object-cover object-center">
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2 text-white text-[10px] font-bold">
+                        Тепло в любой вечер ❄️
+                    </div>
+                </div>
+                <div class="rounded-2xl overflow-hidden border-2 border-white shadow-md aspect-[3/4] relative bg-pink-50">
+                    <img id="img-level-3b" src="" alt="Летний портрет" class="w-full h-full object-cover object-top">
+                    <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 to-transparent p-2 text-white text-[10px] font-bold">
+                        Самая красивая пара 🌹
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3 интерактивных конверта -->
+            <div id="envelopes-grid" class="grid grid-cols-3 gap-2 mb-3.5">
+                <button onclick="pickEnvelope(0)" id="env-0" class="envelope-card bg-gradient-to-b from-pink-50 to-pink-100/90 hover:from-pink-100 hover:to-pink-200 border-2 border-pink-200 rounded-2xl p-3 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs">
+                    <span class="text-2xl sm:text-3xl mb-1">💌</span>
+                    <span class="text-[11px] font-extrabold text-pink-700">Конверт №1</span>
+                </button>
+                <button onclick="pickEnvelope(1)" id="env-1" class="envelope-card bg-gradient-to-b from-purple-50 to-purple-100/90 hover:from-purple-100 hover:to-purple-200 border-2 border-purple-200 rounded-2xl p-3 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs">
+                    <span class="text-2xl sm:text-3xl mb-1">💝</span>
+                    <span class="text-[11px] font-extrabold text-purple-700">Конверт №2</span>
+                </button>
+                <button onclick="pickEnvelope(2)" id="env-2" class="envelope-card bg-gradient-to-b from-amber-50 to-amber-100/90 hover:from-amber-100 hover:to-amber-200 border-2 border-amber-200 rounded-2xl p-3 flex flex-col items-center justify-center transition-all cursor-pointer shadow-xs">
+                    <span class="text-2xl sm:text-3xl mb-1">✨</span>
+                    <span class="text-[11px] font-extrabold text-amber-700">Конверт №3</span>
+                </button>
+            </div>
+
+            <!-- Результат открытого конверта -->
+            <div id="envelope-result" class="hidden bg-gradient-to-r from-rose-50 via-pink-50 to-amber-50 border-2 border-pink-300 rounded-2xl p-3.5 mb-3.5">
+                <div class="text-[10px] font-extrabold uppercase tracking-wider text-pink-500 mb-0.5">Твой сюрприз на вечер!</div>
+                <div id="envelope-prize-title" class="text-sm sm:text-base font-extrabold text-gray-800 mb-1"></div>
+                <p id="envelope-prize-desc" class="text-xs text-gray-600 leading-snug"></p>
+            </div>
+
+            <button id="next-to-finale-btn" onclick="goToFinale()" class="hidden btn-love w-full py-3.5 px-6 rounded-2xl text-white font-extrabold text-base cursor-pointer">
+                Открыть главный сюрприз 🎉
+            </button>
+        </section>
+
+        <!-- ==================== ФИНАЛ: СЕРТИФИКАТ И ПОЛАРОИД-КОЛЛАЖ ==================== -->
+        <section id="screen-finale" class="hidden cozy-card rounded-3xl p-4 sm:p-6 text-center">
+            <div class="inline-flex items-center gap-1 bg-gradient-to-r from-pink-500 to-rose-500 text-white text-[11px] font-extrabold px-3.5 py-1 rounded-full mb-2 shadow-xs">
+                🏆 Квест пройден на 100%!
+            </div>
+
+            <h2 class="text-xl sm:text-2xl font-extrabold text-gray-800 mb-1.5">
+                Ты моё главное счастье 💖
+            </h2>
+            <p class="text-gray-600 text-xs mb-4 leading-relaxed">
+                Спасибо за каждую твою улыбку и за то, что делаешь каждый день особенным!
+            </p>
+
+            <!-- Полароид-галерея из всех 4 кадров -->
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-3.5 mb-4 px-1">
+                <div class="polaroid -rotate-2">
+                    <div class="aspect-square rounded-lg overflow-hidden mb-1.5 bg-pink-50">
+                        <img id="fin-img-0" src="" alt="Фото 1" class="w-full h-full object-cover object-center">
+                    </div>
+                    <p class="font-handwriting text-base sm:text-lg text-gray-700 leading-none">Летние дурачества 😘</p>
+                </div>
+
+                <div class="polaroid rotate-2">
+                    <div class="aspect-square rounded-lg overflow-hidden mb-1.5 bg-pink-50">
+                        <img id="fin-img-1" src="" alt="Фото 2" class="w-full h-full object-cover object-top">
+                    </div>
+                    <p class="font-handwriting text-base sm:text-lg text-gray-700 leading-none">Два сладких котика 🐰</p>
+                </div>
+
+                <div class="polaroid rotate-1">
+                    <div class="aspect-square rounded-lg overflow-hidden mb-1.5 bg-gray-100">
+                        <img id="fin-img-2" src="" alt="Фото 3" class="w-full h-full object-cover object-center">
+                    </div>
+                    <p class="font-handwriting text-base sm:text-lg text-gray-700 leading-none">Наш уютный вечер ❄️</p>
+                </div>
+
+                <div class="polaroid -rotate-1">
+                    <div class="aspect-square rounded-lg overflow-hidden mb-1.5 bg-pink-50">
+                        <img id="fin-img-3" src="" alt="Фото 4" class="w-full h-full object-cover object-top">
+                    </div>
+                    <p class="font-handwriting text-base sm:text-lg text-gray-700 leading-none">Безумно красивая ты 🌹</p>
+                </div>
+            </div>
+
+            <!-- Персональный сертификат -->
+            <div class="relative bg-gradient-to-br from-amber-50 via-pink-50 to-rose-100 border-2 border-dashed border-pink-400 rounded-2xl p-3.5 sm:p-4 mb-4 shadow-inner">
+                <div class="text-[10px] font-extrabold text-pink-500 uppercase tracking-widest mb-1">
+                    🎟️ Персональный сертификат
+                </div>
+                <h3 class="text-base sm:text-lg font-extrabold text-gray-800 mb-1.5 leading-snug">
+                    Бесконечные обнимашки, вкусняшки и твоё выбранное свидание!
+                </h3>
+                <p id="selected-prize-badge" class="text-[11px] font-bold text-rose-600 bg-white/90 inline-block px-3 py-1 rounded-full shadow-2xs">
+                    Бонус: Исполнение любого желания ✨
+                </p>
+            </div>
+
+            <!-- Финальные кнопки -->
+            <div class="flex flex-col sm:flex-row gap-2.5">
+                <button onclick="activateHugSignal()" id="hug-btn" class="btn-love flex-1 py-3 px-4 rounded-2xl text-white font-extrabold text-sm sm:text-base cursor-pointer">
+                    Активировать сертификат 🤗
+                </button>
+                <button onclick="launchConfetti()" class="py-3 px-4 rounded-2xl bg-pink-100 hover:bg-pink-200 text-pink-700 font-bold text-xs sm:text-sm transition cursor-pointer">
+                    Ещё сердечек 💕
+                </button>
+            </div>
+
+            <!-- Подтверждение активации -->
+            <div id="hug-confirmation" class="hidden mt-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl p-3 text-xs font-bold">
+                ✅ Сертификат активирован! Срочно требуй порцию крепких объятий и поцелуев при встрече 💌
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== МОДАЛЬНОЕ ОКНО ЗАГРУЗКИ СВОИХ 4 ФОТО ==================== -->
+    <div id="photo-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 shadow-2xl border-2 border-pink-100 screen-enter max-h-[90dvh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-extrabold text-gray-800">📸 Ваши 4 фотографии</h3>
+                <button onclick="closePhotoModal()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold flex items-center justify-center cursor-pointer">✕</button>
+            </div>
+            <p class="text-xs text-gray-500 mb-3.5 leading-relaxed">
+                Сейчас используются встроенные милые иллюстрации. Вы можете в 1 клик выбрать до 4 ваших фото из галереи телефона — они сохранятся в браузере!
+            </p>
+
+            <!-- Кнопка массового выбора до 4 фото сразу -->
+            <label class="block w-full py-3 px-4 mb-3 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-400 text-white font-extrabold text-xs sm:text-sm text-center cursor-pointer shadow-md hover:opacity-95 transition">
+                📂 Выбрать сразу 4 фото из галереи
+                <input type="file" accept="image/*" multiple class="hidden" onchange="handleBatchUpload(event)">
+            </label>
+
+            <!-- Сетка слотов для каждого из 4 фото -->
+            <div class="grid grid-cols-2 gap-2.5 mb-4">
+                <div class="border border-pink-100 rounded-2xl p-2 text-center bg-pink-50/40">
+                    <div class="aspect-square rounded-xl overflow-hidden mb-1.5 bg-white">
+                        <img id="preview-slot-0" src="" class="w-full h-full object-cover">
+                    </div>
+                    <label class="inline-block text-[11px] font-bold text-pink-600 bg-white px-2.5 py-1 rounded-full border border-pink-200 cursor-pointer">
+                        1. Пазл (Лето)
+                        <input type="file" accept="image/*" class="hidden" onchange="handleSingleUpload(0, event)">
+                    </label>
+                </div>
+
+                <div class="border border-pink-100 rounded-2xl p-2 text-center bg-pink-50/40">
+                    <div class="aspect-square rounded-xl overflow-hidden mb-1.5 bg-white">
+                        <img id="preview-slot-1" src="" class="w-full h-full object-cover">
+                    </div>
+                    <label class="inline-block text-[11px] font-bold text-pink-600 bg-white px-2.5 py-1 rounded-full border border-pink-200 cursor-pointer">
+                        2. Котик в ушках
+                        <input type="file" accept="image/*" class="hidden" onchange="handleSingleUpload(1, event)">
+                    </label>
+                </div>
+
+                <div class="border border-pink-100 rounded-2xl p-2 text-center bg-pink-50/40">
+                    <div class="aspect-square rounded-xl overflow-hidden mb-1.5 bg-white">
+                        <img id="preview-slot-2" src="" class="w-full h-full object-cover">
+                    </div>
+                    <label class="inline-block text-[11px] font-bold text-pink-600 bg-white px-2.5 py-1 rounded-full border border-pink-200 cursor-pointer">
+                        3. Вечерний кадр
+                        <input type="file" accept="image/*" class="hidden" onchange="handleSingleUpload(2, event)">
+                    </label>
+                </div>
+
+                <div class="border border-pink-100 rounded-2xl p-2 text-center bg-pink-50/40">
+                    <div class="aspect-square rounded-xl overflow-hidden mb-1.5 bg-white">
+                        <img id="preview-slot-3" src="" class="w-full h-full object-cover">
+                    </div>
+                    <label class="inline-block text-[11px] font-bold text-pink-600 bg-white px-2.5 py-1 rounded-full border border-pink-200 cursor-pointer">
+                        4. Нарядное фото
+                        <input type="file" accept="image/*" class="hidden" onchange="handleSingleUpload(3, event)">
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="resetToDefaultArt()" class="flex-1 py-2.5 px-3 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold text-xs cursor-pointer">
+                    Вернуть иллюстрации
+                </button>
+                <button onclick="closePhotoModal()" class="flex-1 py-2.5 px-3 rounded-xl bg-pink-500 hover:bg-pink-600 text-white font-extrabold text-xs cursor-pointer">
+                    Готово ✨
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== 1. ГЕНЕРАТОР ВСТРОЕННЫХ ДУШЕВНЫХ ИЛЛЮСТРАЦИЙ (CANVAS -> DATA URL) ====================
+        // Создаёт 4 полноценных романтичных изображения на Canvas, чтобы в предпросмотре никогда не было пустых квадратов
+        function createBuiltInIllustrations() {
+            const artUrls = [];
+
+            // --- ИЛЛЮСТРАЦИЯ 1: Солнечное летнее селфи пары под разноцветным пляжным зонтиком ---
+            {
+                const c = document.createElement('canvas');
+                c.width = 600; c.height = 600;
+                const ctx = c.getContext('2d');
+
+                // Фон: разноцветные сектора пляжного зонтика (кремовый, кораллово-красный, синий)
+                const cx = 300, cy = 120;
+                const slices = [
+                    { start: 0, end: Math.PI * 0.28, color: '#3B82F6' },
+                    { start: Math.PI * 0.28, end: Math.PI * 0.52, color: '#FEF3C7' },
+                    { start: Math.PI * 0.52, end: Math.PI * 0.76, color: '#F87171' },
+                    { start: Math.PI * 0.76, end: Math.PI, color: '#FEF9C3' },
+                    { start: Math.PI, end: Math.PI * 2, color: '#93C5FD' }
+                ];
+                slices.forEach(s => {
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy);
+                    ctx.arc(cx, cy, 650, s.start, s.end);
+                    ctx.closePath();
+                    ctx.fillStyle = s.color;
+                    ctx.fill();
+                });
+
+                // Солнечные блики
+                const sunGrad = ctx.createRadialGradient(380, 140, 10, 380, 140, 260);
+                sunGrad.addColorStop(0, 'rgba(255, 255, 255, 0.75)');
+                sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+                ctx.fillStyle = sunGrad;
+                ctx.fillRect(0, 0, 600, 600);
+
+                // Парень справа в белой футболке
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.ellipse(455, 520, 130, 160, -0.1, 0, Math.PI * 2); ctx.fill();
+                // Шея и лицо парня
+                ctx.fillStyle = '#F5CBA7';
+                ctx.fillRect(405, 310, 65, 90);
+                ctx.beginPath(); ctx.ellipse(435, 235, 78, 95, -0.08, 0, Math.PI * 2); ctx.fill();
+                // Волосы парня (каштановые)
+                ctx.fillStyle = '#5D4037';
+                ctx.beginPath(); ctx.ellipse(430, 175, 86, 62, -0.1, Math.PI * 0.9, Math.PI * 2.15); ctx.fill();
+                // Глаза и улыбка парня
+                ctx.fillStyle = '#3E2723';
+                ctx.beginPath(); ctx.arc(405, 230, 6, 0, Math.PI * 2); ctx.arc(458, 225, 6, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#8D5524'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.arc(435, 268, 22, 0.15, Math.PI - 0.15); ctx.stroke();
+
+                // Девушка слева в чёрном топе, посылает воздушный поцелуй
+                ctx.fillStyle = '#27272A';
+                ctx.beginPath(); ctx.ellipse(190, 540, 150, 150, 0.1, 0, Math.PI * 2); ctx.fill();
+                // Длинные русые волосы
+                ctx.fillStyle = '#8D6E63';
+                ctx.beginPath(); ctx.ellipse(195, 340, 118, 175, 0.08, 0, Math.PI * 2); ctx.fill();
+                // Лицо девушки
+                ctx.fillStyle = '#FAD7A0';
+                ctx.beginPath(); ctx.ellipse(205, 305, 82, 96, 0.08, 0, Math.PI * 2); ctx.fill();
+                // Румянец
+                ctx.fillStyle = 'rgba(255, 117, 151, 0.35)';
+                ctx.beginPath(); ctx.arc(165, 325, 18, 0, Math.PI * 2); ctx.arc(245, 318, 18, 0, Math.PI * 2); ctx.fill();
+                // Закрытые улыбающиеся глазки с ресничками
+                ctx.strokeStyle = '#3E2723'; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.arc(175, 290, 14, 0.1, Math.PI - 0.1); ctx.stroke();
+                ctx.beginPath(); ctx.arc(235, 285, 14, 0.1, Math.PI - 0.1); ctx.stroke();
+                // Губки бантиком (поцелуйчик)
+                ctx.fillStyle = '#E11D48';
+                ctx.beginPath(); ctx.arc(210, 342, 13, 0, Math.PI * 2); ctx.fill();
+
+                // Маленькое сердечко в углу
+                ctx.font = '38px sans-serif';
+                ctx.fillText('☀️', 40, 75);
+                ctx.fillText('😘', 265, 395);
+
+                artUrls.push(c.toDataURL('image/png'));
+            }
+
+            // --- ИЛЛЮСТРАЦИЯ 2: Милый портрет девушки с полосатым котиком в белых заячьих ушках ---
+            {
+                const c = document.createElement('canvas');
+                c.width = 600; c.height = 750;
+                const ctx = c.getContext('2d');
+
+                // Тёплый домашний фон со шторами
+                const bg = ctx.createLinearGradient(0, 0, 600, 750);
+                bg.addColorStop(0, '#F5EBE0');
+                bg.addColorStop(1, '#E3D5CA');
+                ctx.fillStyle = bg;
+                ctx.fillRect(0, 0, 600, 750);
+
+                // Складки штор справа
+                ctx.fillStyle = '#D5BDAF';
+                ctx.fillRect(420, 0, 180, 750);
+                ctx.fillStyle = '#C9ADA7';
+                ctx.fillRect(470, 0, 45, 750);
+
+                // Девушка слева
+                ctx.fillStyle = '#8D6E63';
+                ctx.beginPath(); ctx.ellipse(225, 270, 110, 160, -0.05, 0, Math.PI * 2); ctx.fill();
+                // Плечи и чёрный топ на бретельке
+                ctx.fillStyle = '#FAD7A0';
+                ctx.beginPath(); ctx.ellipse(190, 560, 140, 190, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#18181B';
+                ctx.beginPath(); ctx.ellipse(170, 630, 125, 160, 0, 0, Math.PI * 2); ctx.fill();
+                // Лицо девушки с нежной улыбкой
+                ctx.fillStyle = '#FAD7A0';
+                ctx.beginPath(); ctx.ellipse(225, 250, 84, 102, 0.05, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#3E2723';
+                ctx.beginPath(); ctx.arc(195, 235, 6.5, 0, Math.PI * 2); ctx.arc(255, 238, 6.5, 0, Math.PI * 2); ctx.fill();
+                ctx.strokeStyle = '#A16247'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.arc(222, 282, 24, 0.15, Math.PI - 0.15); ctx.stroke();
+
+                // Полосатый котик на руках справа
+                ctx.fillStyle = '#A1887F';
+                ctx.beginPath(); ctx.ellipse(355, 530, 82, 175, 0.12, 0, Math.PI * 2); ctx.fill();
+                // Полоски на шёрстке котика
+                ctx.strokeStyle = '#5D4037'; ctx.lineWidth = 7;
+                for (let y = 430; y <= 630; y += 35) {
+                    ctx.beginPath(); ctx.moveTo(300, y); ctx.quadraticCurveTo(355, y + 12, 410, y - 5); ctx.stroke();
+                }
+                // Голова котика
+                ctx.fillStyle = '#BCAAA4';
+                ctx.beginPath(); ctx.ellipse(395, 315, 72, 62, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Белая пушистая шапочка с заячьими ушками на котике!
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.ellipse(345, 165, 26, 72, -0.35, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(445, 165, 26, 72, 0.35, 0, Math.PI * 2); ctx.fill();
+                // Розовая серединка ушек
+                ctx.fillStyle = '#FBCFE8';
+                ctx.beginPath(); ctx.ellipse(345, 168, 12, 46, -0.35, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(445, 168, 12, 46, 0.35, 0, Math.PI * 2); ctx.fill();
+                // Пушистый ободок шапочки
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.ellipse(395, 260, 82, 34, 0, 0, Math.PI * 2); ctx.fill();
+
+                // Глазки, носик и усы котика
+                ctx.fillStyle = '#1F2937';
+                ctx.beginPath(); ctx.arc(370, 312, 8, 0, Math.PI * 2); ctx.arc(420, 312, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.arc(368, 309, 2.5, 0, Math.PI * 2); ctx.arc(418, 309, 2.5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#F472B6';
+                ctx.beginPath(); ctx.arc(395, 326, 6, 0, Math.PI * 2); ctx.fill();
+
+                // Лапки котика
+                ctx.fillStyle = '#D7CCC8';
+                ctx.beginPath(); ctx.ellipse(295, 405, 26, 18, -0.3, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(440, 420, 26, 18, 0.4, 0, Math.PI * 2); ctx.fill();
+
+                artUrls.push(c.toDataURL('image/png'));
+            }
+
+            // --- ИЛЛЮСТРАЦИЯ 3: Стильный вечерний чёрно-белый кадр пары в шапках ---
+            {
+                const c = document.createElement('canvas');
+                c.width = 600; c.height = 750;
+                const ctx = c.getContext('2d');
+
+                // Ночное небо и огни фонарей (Ч/Б эстетика)
+                ctx.fillStyle = '#111827';
+                ctx.fillRect(0, 0, 600, 750);
+
+                // Огни уличных фонарей
+                const lights = [[295, 110, 45], [245, 210, 30], [110, 250, 25], [480, 280, 22]];
+                lights.forEach(([lx, ly, lr]) => {
+                    const g = ctx.createRadialGradient(lx, ly, 2, lx, ly, lr * 2.2);
+                    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+                    g.addColorStop(1, 'rgba(255,255,255,0)');
+                    ctx.fillStyle = g;
+                    ctx.beginPath(); ctx.arc(lx, ly, lr * 2.2, 0, Math.PI * 2); ctx.fill();
+                });
+
+                // Парень справа в чёрной куртке с меховым воротником и чёрной шапке
+                ctx.fillStyle = '#1F2937';
+                ctx.beginPath(); ctx.ellipse(435, 580, 155, 210, 0, 0, Math.PI * 2); ctx.fill();
+                // Светлый меховой воротник
+                ctx.fillStyle = '#D1D5DB';
+                ctx.beginPath(); ctx.ellipse(435, 415, 95, 36, 0, 0, Math.PI * 2); ctx.fill();
+                // Лицо парня (монохром)
+                ctx.fillStyle = '#E5E7EB';
+                ctx.beginPath(); ctx.ellipse(435, 315, 66, 82, 0, 0, Math.PI * 2); ctx.fill();
+                // Чёрная шапка бини
+                ctx.fillStyle = '#090D16';
+                ctx.beginPath(); ctx.ellipse(435, 255, 74, 56, 0, Math.PI, Math.PI * 2); ctx.fill();
+                ctx.fillRect(361, 245, 148, 28);
+                // Глаза парня
+                ctx.fillStyle = '#111827';
+                ctx.beginPath(); ctx.arc(412, 312, 5, 0, Math.PI * 2); ctx.arc(458, 312, 5, 0, Math.PI * 2); ctx.fill();
+
+                // Девушка слева в белой пушистой шубке и белой шапочке, смотрит на него
+                ctx.fillStyle = '#F9FAFB';
+                ctx.beginPath(); ctx.ellipse(175, 585, 145, 200, -0.05, 0, Math.PI * 2); ctx.fill();
+                // Профиль лица девушки
+                ctx.fillStyle = '#E5E7EB';
+                ctx.beginPath(); ctx.ellipse(185, 365, 62, 74, 0.15, 0, Math.PI * 2); ctx.fill();
+                // Белая вязаная шапка
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.ellipse(165, 315, 76, 62, -0.35, 0, Math.PI * 2); ctx.fill();
+                // Глаз девушки, смотрящий вправо с нежностью
+                ctx.fillStyle = '#111827';
+                ctx.beginPath(); ctx.arc(215, 355, 5, 0, Math.PI * 2); ctx.fill();
+
+                // Руки вместе на плече
+                ctx.fillStyle = '#F3F4F6';
+                ctx.beginPath(); ctx.ellipse(295, 435, 34, 24, 0, 0, Math.PI * 2); ctx.fill();
+
+                artUrls.push(c.toDataURL('image/png'));
+            }
+
+            // --- ИЛЛЮСТРАЦИЯ 4: Летний солнечный портрет нарядной пары в парке ---
+            {
+                const c = document.createElement('canvas');
+                c.width = 600; c.height = 750;
+                const ctx = c.getContext('2d');
+
+                // Летний парк: зелёная листва сверху, светлая дорожка снизу
+                ctx.fillStyle = '#ECFDF5';
+                ctx.fillRect(0, 0, 600, 750);
+                // Листва деревьев
+                ctx.fillStyle = '#6EE7B7';
+                ctx.beginPath(); ctx.arc(140, 120, 180, 0, Math.PI * 2); ctx.arc(450, 90, 200, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#34D399';
+                ctx.beginPath(); ctx.arc(280, 60, 170, 0, Math.PI * 2); ctx.fill();
+                // Дорожка
+                ctx.fillStyle = '#E5E7EB';
+                ctx.fillRect(0, 520, 600, 230);
+
+                // Парень справа в белой рубашке и чёрных брюках
+                ctx.fillStyle = '#1F2937';
+                ctx.fillRect(320, 440, 120, 250); // брюки
+                ctx.fillStyle = '#FFFFFF';
+                ctx.beginPath(); ctx.roundRect(310, 260, 140, 195, 24); ctx.fill(); // белая рубашка
+                // Голова парня
+                ctx.fillStyle = '#F5CBA7';
+                ctx.beginPath(); ctx.ellipse(380, 195, 44, 54, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#5D4037';
+                ctx.beginPath(); ctx.ellipse(380, 155, 48, 28, 0, Math.PI, Math.PI * 2); ctx.fill();
+
+                // Девушка слева в элегантном бордовом платье
+                ctx.fillStyle = '#881337';
+                ctx.beginPath();
+                ctx.moveTo(220, 285);
+                ctx.lineTo(295, 285);
+                ctx.lineTo(280, 610);
+                ctx.lineTo(165, 580);
+                ctx.closePath();
+                ctx.fill();
+                // Голова девушки
+                ctx.fillStyle = '#FAD7A0';
+                ctx.beginPath(); ctx.ellipse(255, 225, 40, 48, 0, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#8D6E63';
+                ctx.beginPath(); ctx.ellipse(242, 212, 42, 45, -0.2, 0, Math.PI * 2); ctx.fill();
+
+                // Объятия (рука девушки на плече парня)
+                ctx.strokeStyle = '#FAD7A0'; ctx.lineWidth = 14; ctx.lineCap = 'round';
+                ctx.beginPath(); ctx.moveTo(280, 325); ctx.lineTo(355, 275); ctx.stroke();
+
+                // Солнечные блики и сердечко
+                ctx.font = '34px sans-serif';
+                ctx.fillText('🌹', 485, 680);
+
+                artUrls.push(c.toDataURL('image/png'));
+            }
+
+            return artUrls;
+        }
+
+        // ==================== 2. УПРАВЛЕНИЕ ФОТОГРАФИЯМИ (ВСТРОЕННЫЕ + ПОЛЬЗОВАТЕЛЬСКИЕ) ====================
+        const DEFAULT_ARTS = createBuiltInIllustrations();
+        let activePhotos = [...DEFAULT_ARTS];
+
+        function loadSavedPhotos() {
+            try {
+                const saved = localStorage.getItem('love_quest_custom_photos');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length === 4) {
+                        activePhotos = parsed.map((item, i) => item || DEFAULT_ARTS[i]);
+                    }
+                }
+            } catch (e) {
+                console.warn('Не удалось прочитать сохранённые фото:', e);
+            }
+            applyPhotosToDOM();
+        }
+
+        function saveCustomPhotos() {
+            try {
+                localStorage.setItem('love_quest_custom_photos', JSON.stringify(activePhotos));
+            } catch (e) {
+                console.warn('Память localStorage переполнена, фото останутся на текущую сессию');
+            }
+            applyPhotosToDOM();
+        }
+
+        function applyPhotosToDOM() {
+            // Уровень 1: подсказка и плитки пазла
+            const hintImg = document.getElementById('hint-image-el');
+            if (hintImg) hintImg.src = activePhotos[0];
+
+            // Уровень 2: котик в ушках
+            const img2 = document.getElementById('img-level-2');
+            if (img2) img2.src = activePhotos[1];
+
+            // Уровень 3: вечерний кадр и летний портрет
+            const img3a = document.getElementById('img-level-3a');
+            const img3b = document.getElementById('img-level-3b');
+            if (img3a) img3a.src = activePhotos[2];
+            if (img3b) img3b.src = activePhotos[3];
+
+            // Финал: 4 полароида
+            for (let i = 0; i < 4; i++) {
+                const finEl = document.getElementById(`fin-img-${i}`);
+                if (finEl) finEl.src = activePhotos[i];
+                const slotEl = document.getElementById(`preview-slot-${i}`);
+                if (slotEl) slotEl.src = activePhotos[i];
+            }
+
+            // Индикатор на стартовом экране
+            const customCount = activePhotos.filter((src, idx) => src !== DEFAULT_ARTS[idx]).length;
+            const badge = document.getElementById('photo-badge-count');
+            if (badge) {
+                badge.textContent = customCount > 0 ? `${customCount}/4` : 'Арт';
+            }
+
+            // Перерисовать пазл, если он открыт
+            if (!document.getElementById('screen-level-1').classList.contains('hidden')) {
+                renderPuzzle();
+            }
+        }
+
+        // Сжатие фото при загрузке из галереи телефона, чтобы легко помещалось в localStorage
+        function compressImageFile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const maxDim = 800;
+                        let w = img.width;
+                        let h = img.height;
+                        if (w > maxDim || h > maxDim) {
+                            if (w > h) {
+                                h = Math.round((h * maxDim) / w);
+                                w = maxDim;
+                            } else {
+                                w = Math.round((w * maxDim) / h);
+                                h = maxDim;
+                            }
+                        }
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w;
+                        canvas.height = h;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', 0.82));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        async function handleSingleUpload(slotIndex, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const dataUrl = await compressImageFile(file);
+            activePhotos[slotIndex] = dataUrl;
+            saveCustomPhotos();
+        }
+
+        async function handleBatchUpload(event) {
+            const files = Array.from(event.target.files).slice(0, 4);
+            if (files.length === 0) return;
+            for (let i = 0; i < files.length; i++) {
+                activePhotos[i] = await compressImageFile(files[i]);
+            }
+            saveCustomPhotos();
+        }
+
+        function resetToDefaultArt() {
+            activePhotos = [...DEFAULT_ARTS];
+            localStorage.removeItem('love_quest_custom_photos');
+            applyPhotosToDOM();
+        }
+
+        function openPhotoModal() {
+            applyPhotosToDOM();
+            document.getElementById('photo-modal').classList.remove('hidden');
+        }
+
+        function closePhotoModal() {
+            document.getElementById('photo-modal').classList.add('hidden');
+        }
+
+        // ==================== 3. СОСТОЯНИЕ ИГРЫ И ЗВУК ====================
+        let soundEnabled = true;
+        let audioReady = false;
+        let synth = null;
+
+        let puzzleOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+        let selectedTileIndex = null;
+        let puzzleSolved = false;
+
+        let cozyScore = 0;
+        let level2Completed = false;
+
+        let envelopePicked = false;
+        const prizes = [
+            {
+                title: "🍿 Уютный киновечер под пледом",
+                desc: "Выбираешь любой фильм или сериал, а с меня — плед, обнимашки и твои любимые вкусняшки!"
+            },
+            {
+                title: "☕ Вечерняя прогулка и любимый кофе/какао",
+                desc: "Идём гулять, смеяться, фоткаться и пить самый вкусный тёплый напиток!"
+            },
+            {
+                title: "💆‍♀️ Вечер полного релакса и массажа",
+                desc: "Никаких забот: только отдых, нежность и полная забота о самой лучшей девочке!"
+            }
+        ];
+
+        function initFloatingBackground() {
+            const container = document.getElementById('floating-bg');
+            const icons = ['💖', '✨', '🌸', '💕', '🤍', '🌷'];
+            for (let i = 0; i < 16; i++) {
+                const el = document.createElement('div');
+                el.className = 'bg-particle';
+                el.textContent = icons[i % icons.length];
+                el.style.left = `${Math.random() * 100}%`;
+                el.style.fontSize = `${14 + Math.random() * 14}px`;
+                el.style.animationDuration = `${11 + Math.random() * 11}s`;
+                el.style.animationDelay = `${-Math.random() * 15}s`;
+                container.appendChild(el);
+            }
+        }
+
+        async function initAudio() {
+            if (audioReady || typeof Tone === 'undefined') return;
+            try {
+                await Tone.start();
+                synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: "sine" },
+                    envelope: { attack: 0.02, decay: 0.2, sustain: 0.1, release: 0.8 }
+                }).toDestination();
+                synth.volume.value = -10;
+                audioReady = true;
+            } catch (e) {}
+        }
+
+        function playNote(notes, duration = "16n") {
+            if (!soundEnabled || !audioReady || !synth) return;
+            try {
+                const now = Tone.now();
+                if (Array.isArray(notes)) {
+                    notes.forEach((note, idx) => synth.triggerAttackRelease(note, duration, now + idx * 0.08));
+                } else {
+                    synth.triggerAttackRelease(notes, duration, now);
+                }
+            } catch (e) {}
+        }
+
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            document.getElementById('sound-btn').textContent = soundEnabled ? '🔔' : '🔕';
+        }
+
+        // ==================== 4. НАВИГАЦИЯ ПО ЭКРАНАМ ====================
+        function showScreen(screenId) {
+            const screens = ['screen-welcome', 'screen-level-1', 'screen-level-2', 'screen-level-3', 'screen-finale'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === screenId) {
+                    el.classList.remove('hidden');
+                    el.classList.remove('screen-enter');
+                    void el.offsetWidth;
+                    el.classList.add('screen-enter');
+                } else {
+                    el.classList.add('hidden');
+                }
+            });
+        }
+
+        async function startQuest() {
+            await initAudio();
+            playNote(["C5", "E5", "G5"]);
+            document.getElementById('progress-header').classList.remove('hidden');
+            goToLevel(1);
+        }
+
+        function goToLevel(level) {
+            const label = document.getElementById('step-label');
+            const bar = document.getElementById('progress-bar');
+
+            if (level === 1) {
+                label.textContent = 'Уровень 1 из 3';
+                bar.style.width = '33%';
+                initPuzzle();
+                showScreen('screen-level-1');
+            } else if (level === 2) {
+                playNote(["D5", "F#5", "A5"]);
+                label.textContent = 'Уровень 2 из 3';
+                bar.style.width = '66%';
+                showScreen('screen-level-2');
+            } else if (level === 3) {
+                playNote(["E5", "G#5", "B5"]);
+                label.textContent = 'Уровень 3 из 3';
+                bar.style.width = '100%';
+                showScreen('screen-level-3');
+            }
+        }
+
+        function goToFinale() {
+            playNote(["C5", "E5", "G5", "C6"], "8n");
+            document.getElementById('step-label').textContent = 'Финал ✨';
+            showScreen('screen-finale');
+            launchConfetti();
+        }
+
+        // ==================== 5. УРОВЕНЬ 1: ПАЗЛ ====================
+        function initPuzzle() {
+            puzzleOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+            do {
+                for (let i = puzzleOrder.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [puzzleOrder[i], puzzleOrder[j]] = [puzzleOrder[j], puzzleOrder[i]];
+                }
+            } while (isPuzzleSolved());
+
+            selectedTileIndex = null;
+            puzzleSolved = false;
+            renderPuzzle();
+        }
+
+        function isPuzzleSolved() {
+            return puzzleOrder.every((val, idx) => val === idx);
+        }
+
+        function renderPuzzle() {
+            const board = document.getElementById('puzzle-board');
+            board.innerHTML = '';
+            const currentImg = activePhotos[0];
+
+            puzzleOrder.forEach((pieceIndex, boardPos) => {
+                const tile = document.createElement('div');
+                tile.className = 'puzzle-tile';
+                if (selectedTileIndex === boardPos) tile.classList.add('selected');
+                if (puzzleSolved || pieceIndex === boardPos) tile.classList.add('correct-glow');
+
+                const col = pieceIndex % 3;
+                const row = Math.floor(pieceIndex / 3);
+                tile.style.backgroundImage = `url('${currentImg}')`;
+                tile.style.backgroundPosition = `${col * 50}% ${row * 50}%`;
+
+                tile.onclick = () => handleTileClick(boardPos);
+                board.appendChild(tile);
+            });
+        }
+
+        function handleTileClick(boardPos) {
+            if (puzzleSolved) return;
+
+            if (selectedTileIndex === null) {
+                selectedTileIndex = boardPos;
+                playNote("E5", "32n");
+                renderPuzzle();
+            } else if (selectedTileIndex === boardPos) {
+                selectedTileIndex = null;
+                renderPuzzle();
+            } else {
+                const temp = puzzleOrder[selectedTileIndex];
+                puzzleOrder[selectedTileIndex] = puzzleOrder[boardPos];
+                puzzleOrder[boardPos] = temp;
+                selectedTileIndex = null;
+                playNote("G5", "32n");
+                renderPuzzle();
+
+                if (isPuzzleSolved()) {
+                    puzzleSolved = true;
+                    onPuzzleComplete();
+                }
+            }
+        }
+
+        function autoSolvePuzzle() {
+            if (puzzleSolved) return;
+            puzzleOrder = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+            selectedTileIndex = null;
+            puzzleSolved = true;
+            renderPuzzle();
+            onPuzzleComplete();
+        }
+
+        function onPuzzleComplete() {
+            playNote(["C5", "E5", "G5", "B5"], "8n");
+            document.getElementById('level-1-win').classList.remove('hidden');
+            document.getElementById('puzzle-controls').classList.add('hidden');
+            document.getElementById('next-to-2-btn').classList.remove('hidden');
+            launchConfetti();
+        }
+
+        function showHint(visible) {
+            const overlay = document.getElementById('puzzle-hint-overlay');
+            if (visible) overlay.classList.remove('hidden');
+            else overlay.classList.add('hidden');
+        }
+
+        // ==================== 6. УРОВЕНЬ 2: ДЕТЕКТОР МИЛОТЫ ====================
+        const cutePhrases = [
+            "Мурр-мяу! +15% к уюту 🐾",
+            "Какие милые ушки! 🐰",
+            "Твоя улыбка — просто космос ✨",
+            "Заряд нежности растёт! 💖",
+            "Уровень очарования зашкаливает! 🥰",
+            "Самая сладкая булочка 🥐",
+            "Почти на максимуме тепла! 🔥"
+        ];
+
+        function petCat(event) {
+            spawnTapHeart(event.clientX, event.clientY);
+
+            if (cozyScore < 100) {
+                cozyScore = Math.min(100, cozyScore + 15);
+                const percent = Math.round(cozyScore);
+                document.getElementById('cozy-percent').textContent = `${percent}%`;
+                document.getElementById('cozy-meter-bar').style.width = `${percent}%`;
+
+                const phraseEl = document.getElementById('pet-phrase');
+                phraseEl.textContent = cutePhrases[Math.floor(Math.random() * cutePhrases.length)];
+
+                const notes = ["C5", "D5", "E5", "F5", "G5", "A5", "B5", "C6"];
+                const noteIdx = Math.min(notes.length - 1, Math.floor((percent / 100) * notes.length));
+                playNote(notes[noteIdx], "32n");
+
+                if (percent >= 25) document.getElementById('sticker-1').classList.remove('hidden');
+                if (percent >= 50) document.getElementById('sticker-2').classList.remove('hidden');
+                if (percent >= 75) document.getElementById('sticker-3').classList.remove('hidden');
+                if (percent >= 100) {
+                    document.getElementById('sticker-4').classList.remove('hidden');
+                    phraseEl.textContent = "100% чистого счастья и уюта! 💖";
+                    if (!level2Completed) {
+                        level2Completed = true;
+                        document.getElementById('level-2-win').classList.remove('hidden');
+                        document.getElementById('next-to-3-btn').classList.remove('hidden');
+                        launchConfetti();
+                    }
+                }
+            } else {
+                playNote("C6", "32n");
+            }
+        }
+
+        function spawnTapHeart(x, y) {
+            const emojis = ['💖', '🐾', '✨', '💕', '🐰', '🥰'];
+            const heart = document.createElement('div');
+            heart.className = 'tap-heart';
+            heart.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            heart.style.left = `${x || window.innerWidth / 2}px`;
+            heart.style.top = `${y || window.innerHeight / 2}px`;
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 900);
+        }
+
+        // ==================== 7. УРОВЕНЬ 3: ВЫБОР КОНВЕРТА ====================
+        function pickEnvelope(index) {
+            const prize = prizes[index];
+            playNote(["F5", "A5", "C6"], "8n");
+
+            [0, 1, 2].forEach(i => {
+                const btn = document.getElementById(`env-${i}`);
+                if (i === index) {
+                    btn.classList.add('ring-4', 'ring-pink-400', 'scale-105', 'bg-white');
+                    btn.classList.remove('opacity-60');
+                    btn.querySelector('span:first-child').textContent = '🎉';
+                } else {
+                    btn.classList.remove('ring-4', 'ring-pink-400', 'scale-105');
+                    btn.classList.add('opacity-60');
+                }
+            });
+
+            document.getElementById('envelope-prize-title').textContent = prize.title;
+            document.getElementById('envelope-prize-desc').textContent = prize.desc;
+            document.getElementById('envelope-result').classList.remove('hidden');
+            document.getElementById('next-to-finale-btn').classList.remove('hidden');
+            document.getElementById('selected-prize-badge').textContent = `Бонус: ${prize.title}`;
+
+            if (!envelopePicked) {
+                envelopePicked = true;
+                launchConfetti();
+            }
+        }
+
+        // ==================== 8. ФИНАЛ И САЛЮТ ИЗ СЕРДЕЧЕК ====================
+        function activateHugSignal() {
+            playNote(["C5", "E5", "G5", "C6"], "4n");
+            document.getElementById('hug-confirmation').classList.remove('hidden');
+            document.getElementById('hug-btn').textContent = 'Сертификат активирован! 💖';
+            launchConfetti();
+        }
+
+        let confettiParticles = [];
+        let confettiAnimId = null;
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const colors = ['#FF7597', '#FF9671', '#FFC75F', '#C084FC', '#F472B6', '#34D399'];
+            const shapes = ['heart', 'circle', 'rect'];
+
+            for (let i = 0; i < 70; i++) {
+                confettiParticles.push({
+                    x: canvas.width / 2 + (Math.random() - 0.5) * 160,
+                    y: canvas.height * 0.55,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: -Math.random() * 14 - 4,
+                    size: 6 + Math.random() * 7,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    shape: shapes[Math.floor(Math.random() * shapes.length)],
+                    rotation: Math.random() * Math.PI * 2,
+                    vRot: (Math.random() - 0.5) * 0.2,
+                    alpha: 1
+                });
+            }
+
+            if (!confettiAnimId) animateConfetti();
+        }
+
+        function animateConfetti() {
+            const canvas = document.getElementById('confetti-canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            confettiParticles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.35;
+                p.vx *= 0.98;
+                p.rotation += p.vRot;
+                p.alpha -= 0.013;
+
+                if (p.alpha > 0) {
+                    ctx.save();
+                    ctx.globalAlpha = Math.max(0, p.alpha);
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate(p.rotation);
+                    ctx.fillStyle = p.color;
+
+                    if (p.shape === 'heart') {
+                        const s = p.size * 0.6;
+                        ctx.beginPath();
+                        ctx.moveTo(0, s);
+                        ctx.bezierCurveTo(-s * 2, -s * 0.5, -s, -s * 2, 0, -s * 0.7);
+                        ctx.bezierCurveTo(s, -s * 2, s * 2, -s * 0.5, 0, s);
+                        ctx.fill();
+                    } else if (p.shape === 'circle') {
+                        ctx.beginPath();
+                        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+                        ctx.fill();
+                    } else {
+                        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+                    }
+                    ctx.restore();
+                }
+            });
+
+            confettiParticles = confettiParticles.filter(p => p.alpha > 0 && p.y < canvas.height + 30);
+
+            if (confettiParticles.length > 0) {
+                confettiAnimId = requestAnimationFrame(animateConfetti);
+            } else {
+                confettiAnimId = null;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            const canvas = document.getElementById('confetti-canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Инициализация при загрузке страницы
+        window.onload = function () {
+            initFloatingBackground();
+            loadSavedPhotos();
+        };
+    </script>
+</body>
+</html>
